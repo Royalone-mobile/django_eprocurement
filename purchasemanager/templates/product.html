@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if error_message %}
+<div class="danger">{{ error_message }}</div>
+{% endif %}
+
+{% if product %}
+
+<h2 class="text-center">{{ product.name }}</h2>
+
+<!-- Product information -->
+
+<form method="POST" action="{% url 'purchasemanager:update_product' product.id %}" name="product" class="form-horizontal">
+	{% csrf_token %}
+	<div class="panel panel-primary">
+		<div class="panel-heading">Product Info</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">ID:</label>
+				<div class="col-sm-6">
+					<p class="form-control-static">{{ product.id }}</a></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Code:</label>
+				<div class="col-sm-6">
+					<input type="text" class="form-control" name="code" value="{{ product.code }}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Description:</label>
+				<div class="col-sm-6">
+					<input type="text" class="form-control" name="description" value="{{ product.description }}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Unit:</label>
+				<div class="col-sm-6">
+					<input type="text" class="form-control" name="unit" value="{{ product.unit }}" />
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer">
+			<input type="submit" value="Update" class="btn btn-primary">
+		</div>
+	</div>
+</form>
+
+<!-- END Product information -->
+
+<!-- Product purchases -->
+
+<div class="panel panel-primary">
+	<div class="panel-heading">Product Vendors</div>
+	<table class="table table-hover">
+		<tr>
+			<th>Vendor</th>
+			<th>Date</th>
+			<th>Price</th>
+			<th class="text-right">Actions</th>
+		</tr>
+	{% for purchase in purchases %}
+		<tr>
+			<td>{{ purchase.id }}</td>
+			<td>{{ purchase.date }}</td>
+			<td>{{ purchase.status }}</td>
+			<td class="text-right">
+				<a href="{% url 'purchasemanager:purchase' purchase.id %}" class="btn btn-xs btn-primary">View</a>
+				<button type="button" data-toggle="modal" data-target="#confirmdelete" data-object-name="{{ purchase.id }}" data-delete-url="{% url 'purchasemanager:delete_purchase' purchase.id %}" class="btn btn-xs btn-danger">Delete</button>
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="confirmdelete" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Confirm</h4>
+			</div>
+			<div class="modal-body">
+				
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+				<a href="#" class="btn btn-danger">Yes</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function() {
+		$('#confirmdelete').on('show.bs.modal', function(e) {
+			var name = $(e.relatedTarget).data('object-name');
+			var url = $(e.relatedTarget).data('delete-url');
+			$('#confirmdelete .modal-body').html("Are you sure you want to delete purchase " + name + "?<br><i>This will delete all associated items, expenses, and attachments!</i>");
+			$('#confirmdelete .modal-footer a').attr('href', url);
+		});
+	});
+</script>
+<!-- END delete confirmation modal -->
+
+{% endif %}
+
+{% endblock %}

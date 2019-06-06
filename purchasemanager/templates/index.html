@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if purchase_list %}
+
+<div class="panel panel-primary">
+	<div class="panel-heading">{% if title %}{{ title }}{% else %}Purchases{% endif %}</div>
+	<table class="table table-hover">
+		<tr>
+			<th>Purchase</th>
+			<th>Vendor</th>
+			<th>Date</th>
+			<th>Status</th>
+			<th>Total</th>
+			<th class="text-right">Actions</th>
+		</tr>
+		
+		{% for purchase in purchase_list %}
+		<tr>
+			<td>{{ purchase.id }}</td>
+			<td>{{ purchase.vendor }}</td>
+			<td>{{ purchase.date|date:"SHORT_DATE_FORMAT" }}</td>
+			<td>{{ purchase.status }}</td>
+			<td>MVR{{ purchase.total_items }}</td>
+			<td class="text-right">
+				<a href="{% url 'purchasemanager:purchase' purchase.id %}" class="btn btn-xs btn-primary">View</a>
+				<a href="{% url 'purchasemanager:vendor' purchase.vendor.id %}" class="btn btn-xs btn-default">Vendor</a>
+				<button type="button" data-toggle="modal" data-target="#confirmdelete" data-object-name="{{ purchase.id }}" data-delete-url="{% url 'purchasemanager:delete_purchase' purchase.id %}" class="btn btn-xs btn-danger">Delete</button>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="confirmdelete" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Confirm</h4>
+			</div>
+			<div class="modal-body">
+				
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+				<a href="#" class="btn btn-danger">Yes</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function() {
+		$('#confirmdelete').on('show.bs.modal', function(e) {
+			var name = $(e.relatedTarget).data('object-name');
+			var url = $(e.relatedTarget).data('delete-url');
+			$('#confirmdelete .modal-body').html("Are you sure you want to delete purchase " + name + "?<br><i>This will delete all associated items, expenses, and attachments!</i>");
+			$('#confirmdelete .modal-footer a').attr('href', url);
+		});
+	});
+</script>
+<!-- END delete confirmation modal -->
+	
+{% else %}
+<div class="alert alert-warning">No purchases!</div>
+{% endif %}
+
+{% endblock %}

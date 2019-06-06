@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if error_message %}
+<div class="danger">{{ error_message }}</div>
+{% endif %}
+
+{% if vendor %}
+
+<h2 class="text-center">{{ vendor.name }}</h2>
+
+<!-- Vendor information -->
+
+<form method="POST" action="{% url 'purchasemanager:update_vendor' vendor.id %}" name="vendor" class="form-horizontal">
+	{% csrf_token %}
+	<div class="panel panel-primary">
+		<div class="panel-heading">Vendor Info</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">ID:</label>
+				<div class="col-sm-6">
+					<p class="form-control-static">{{ vendor.id }}</a></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Name:</label>
+				<div class="col-sm-6">
+					<input type="text" class="form-control" name="name" value="{{ vendor.name }}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Address 1:</label>
+				<div class="col-sm-6">
+					<input type="text" class="form-control" name="address1" value="{{ vendor.address1 }}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Address 2:</label>
+				<div class="col-sm-6">
+					<input type="text" class="form-control" name="address2" value="{{ vendor.address2 }}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Atoll Island:</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" name="atoll" value="{{ vendor.atoll }}" />
+				</div>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" name="island" value="{{ vendor.island }}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Email:</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" name="email" value="{{ vendor.email }}" />
+				</div>
+				<div class="col-sm-2">
+					<a href="mailto:{{ vendor.email }}" class="btn btn-default form-control">Send E-mail</a>
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer">
+			<input type="submit" value="Update" class="btn btn-primary">
+		</div>
+	</div>
+</form>
+
+<!-- END Vendor information -->
+
+<!-- Vendor purchases -->
+
+<div class="panel panel-primary">
+	<div class="panel-heading">Vendor Purchases</div>
+	<table class="table table-hover">
+		<tr>
+			<th>Purchase</th>
+			<th>Date</th>
+			<th>Status</th>
+			<th>Total</th>
+			<th class="text-right">Actions</th>
+		</tr>
+	{% for purchase in purchases %}
+		<tr>
+			<td>{{ purchase.id }}</td>
+			<td>{{ purchase.date }}</td>
+			<td>{{ purchase.status }}</td>
+			<td>{{ purchase.total_items }}</td>
+			<td class="text-right">
+				<a href="{% url 'purchasemanager:purchase' purchase.id %}" class="btn btn-xs btn-primary">View</a>
+				<button type="button" data-toggle="modal" data-target="#confirmdelete" data-object-name="{{ purchase.id }}" data-delete-url="{% url 'purchasemanager:delete_purchase' purchase.id %}" class="btn btn-xs btn-danger">Delete</button>
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="confirmdelete" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Confirm</h4>
+			</div>
+			<div class="modal-body">
+				
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+				<a href="#" class="btn btn-danger">Yes</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function() {
+		$('#confirmdelete').on('show.bs.modal', function(e) {
+			var name = $(e.relatedTarget).data('object-name');
+			var url = $(e.relatedTarget).data('delete-url');
+			$('#confirmdelete .modal-body').html("Are you sure you want to delete purchase " + name + "?<br><i>This will delete all associated items, expenses, and attachments!</i>");
+			$('#confirmdelete .modal-footer a').attr('href', url);
+		});
+	});
+</script>
+<!-- END delete confirmation modal -->
+
+{% endif %}
+
+{% endblock %}

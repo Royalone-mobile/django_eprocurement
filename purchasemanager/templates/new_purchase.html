@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if error_message %}
+<div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+
+{% if vendor_list %}
+
+<form method="POST" action="{% url 'purchasemanager:new_purchase' %}" name="vendor" class="form-horizontal">
+	{% csrf_token %}
+	<div class="panel panel-primary">
+		<div class="panel-heading">Select Vendor</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Vendor:</label>
+				<div class="col-sm-6">
+					<select class="form-control" name="vendor_id">
+						<option value="None">(Select)</option>
+						{% for vendor in vendor_list %}
+						<option value="{{ vendor.id }}">{{ vendor.name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer">
+			<a href="{% url 'purchasemanager:new_vendor' %}" class="btn btn-default">Add New Vendor</a>
+			<input type="submit" value="Create Purchase" class="btn btn-primary">
+		</div>
+	</div>
+</form>
+
+{% else %}
+
+<div class="alert alert-danger">No vendors!</div>
+
+{% endif %}
+
+{% endblock %}
